@@ -107,6 +107,37 @@
       margin-top: 4px;
     }
 
+    .timezone-chip {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 10px;
+      padding: 8px 10px;
+      width: 100%;
+      box-shadow: inset 0 0 0 1px #dcfce7;
+    }
+
+    .timezone-chip .tz-label {
+      font-weight: 700;
+      color: #166534;
+      font-size: 14px;
+    }
+
+    .timezone-chip .tz-code {
+      font-weight: 600;
+      color: #065f46;
+      font-size: 13px;
+    }
+
+    .timezone-chip .tz-zone {
+      font-size: 12px;
+      color: var(--muted);
+      word-break: break-word;
+    }
+
     .checkbox-row {
       background: var(--header-bg);
     }
@@ -330,6 +361,7 @@
       head.innerHTML = '';
 
       const checkboxRow = document.createElement('tr');
+      const timezoneRow = document.createElement('tr');
       const labelRow = document.createElement('tr');
 
       const nameCheckboxCell = document.createElement('th');
@@ -339,6 +371,10 @@
       const nameLabelCell = document.createElement('th');
       nameLabelCell.textContent = 'Datacenter';
       labelRow.appendChild(nameLabelCell);
+
+      const tzInfoHeader = document.createElement('th');
+      tzInfoHeader.textContent = 'Időzóna jelmagyarázat';
+      timezoneRow.appendChild(tzInfoHeader);
 
       timeZones.forEach((tz, index) => {
         const cbCell = document.createElement('th');
@@ -357,9 +393,21 @@
         const currentOffset = formatOffset(DateTime.now().setZone(tz.zone).offset);
         labelCell.innerHTML = `<div>${tz.label}</div><span class="tz-code">${tz.zone} (${currentOffset})</span>`;
         labelRow.appendChild(labelCell);
+
+        const chipCell = document.createElement('th');
+        chipCell.dataset.col = index;
+        chipCell.innerHTML = `
+          <div class="timezone-chip">
+            <div class="tz-label">${tz.label}</div>
+            <div class="tz-code">${tz.code}</div>
+            <div class="tz-zone">${tz.zone}</div>
+          </div>
+        `;
+        timezoneRow.appendChild(chipCell);
       });
 
       head.appendChild(checkboxRow);
+      head.appendChild(timezoneRow);
       head.appendChild(labelRow);
     }
 
