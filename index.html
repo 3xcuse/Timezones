@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Time Zone Planner</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --accent: #1b7a4d;
+      --border: #d6d9de;
+      --header-bg: #f4f6f8;
+      --muted: #6b7280;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: #f8fafc;
+      color: #0f172a;
+      padding: 24px;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-weight: 700;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(27, 122, 77, 0.2);
+      transition: transform 120ms ease, box-shadow 120ms ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(27, 122, 77, 0.25);
+    }
+
+    button.secondary {
+      background: white;
+      color: #0f172a;
+      border: 1px solid var(--border);
+      box-shadow: none;
+    }
+
+    .table-wrapper {
+      overflow: auto;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: white;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.07);
+    }
+
+    table {
+      border-collapse: collapse;
+      width: max-content;
+      min-width: 100%;
+    }
+
+    thead {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: white;
+    }
+
+    th, td {
+      border: 1px solid var(--border);
+      padding: 6px;
+      text-align: center;
+      min-width: 150px;
+      background: white;
+    }
+
+    th:first-child, td:first-child {
+      position: sticky;
+      left: 0;
+      background: #f9fafb;
+      z-index: 1;
+      min-width: 180px;
+      text-align: left;
+    }
+
+    th .tz-code {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .checkbox-row {
+      background: var(--header-bg);
+    }
+
+    .checkbox-row input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
+    .selected-column {
+      outline: 3px solid #5bd28f;
+      outline-offset: -2px;
+      box-shadow: inset 0 0 0 1px rgba(91, 210, 143, 0.5);
+    }
+
+    .cell-content {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .cell-content input[type="datetime-local"],
+    .cell-content input[type="text"] {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .cell-content input:focus {
+      outline: 2px solid var(--accent);
+      border-color: var(--accent);
+    }
+
+    .day-shift {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: right;
+      min-height: 16px;
+    }
+
+    .hint {
+      color: var(--muted);
+      margin: 6px 0 14px;
+      max-width: 960px;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+  <h1>Időzóna tervező</h1>
+  <p class="hint">24 időzóna oszlop, zöld kerettel jelölhető oszlopokkal. Írj be egy dátumot/időt az egyik cellába, majd kattints a „Sor mentése” gombra: a teljes sor frissül az összes többi időzóna szerinti lokális időre, automatikus téli/nyári időszámítási korrekcióval és napváltás jelzéssel.</p>
+
+  <div class="controls">
+    <button id="add-row">Datacenter hozzáadása</button>
+    <button id="save-row" class="secondary">Sor mentése</button>
+    <span id="status" class="hint"></span>
+  </div>
+
+  <div class="table-wrapper">
+    <table id="tz-table" aria-label="time zone table">
+      <thead id="table-head"></thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4/build/global/luxon.min.js"></script>
+  <script>
+    const { DateTime } = luxon;
+
+    const timeZones = [
+      { label: 'AoE', code: 'UTC-12', zone: 'Etc/GMT+12' },
+      { label: 'HST', code: 'UTC-10', zone: 'Pacific/Honolulu' },
+      { label: 'AKST', code: 'UTC-9', zone: 'America/Anchorage' },
+      { label: 'PT', code: 'UTC-8', zone: 'America/Los_Angeles' },
+      { label: 'MT', code: 'UTC-7', zone: 'America/Denver' },
+      { label: 'CT', code: 'UTC-6', zone: 'America/Chicago' },
+      { label: 'ET', code: 'UTC-5', zone: 'America/New_York' },
+      { label: 'VET', code: 'UTC-4', zone: 'America/Caracas' },
+      { label: 'BRT', code: 'UTC-3', zone: 'America/Sao_Paulo' },
+      { label: 'AZOT', code: 'UTC-1', zone: 'Atlantic/Azores' },
+      { label: 'GMT', code: 'UTC+0', zone: 'Europe/London' },
+      { label: 'GMT', code: 'UTC+0', zone: 'Europe/Dublin' },
+      { label: 'CET', code: 'UTC+1', zone: 'Europe/Paris' },
+      { label: 'CET', code: 'UTC+1', zone: 'Europe/Budapest' },
+      { label: 'EET', code: 'UTC+2', zone: 'Europe/Athens' },
+      { label: 'MSK', code: 'UTC+3', zone: 'Europe/Moscow' },
+      { label: 'GST', code: 'UTC+4', zone: 'Asia/Dubai' },
+      { label: 'PKT', code: 'UTC+5', zone: 'Asia/Karachi' },
+      { label: 'BDT', code: 'UTC+6', zone: 'Asia/Dhaka' },
+      { label: 'ICT', code: 'UTC+7', zone: 'Asia/Bangkok' },
+      { label: 'CST', code: 'UTC+8', zone: 'Asia/Shanghai' },
+      { label: 'JST', code: 'UTC+9', zone: 'Asia/Tokyo' },
+      { label: 'AEST', code: 'UTC+10', zone: 'Australia/Sydney' },
+      { label: 'NZST', code: 'UTC+12', zone: 'Pacific/Auckland' }
+    ];
+
+    let lastEdited = null;
+
+    function buildTableHead() {
+      const head = document.getElementById('table-head');
+      head.innerHTML = '';
+
+      const checkboxRow = document.createElement('tr');
+      const labelRow = document.createElement('tr');
+
+      const nameCheckboxCell = document.createElement('th');
+      nameCheckboxCell.textContent = 'Datacenter oszlop';
+      checkboxRow.appendChild(nameCheckboxCell);
+
+      const nameLabelCell = document.createElement('th');
+      nameLabelCell.textContent = 'Datacenter';
+      labelRow.appendChild(nameLabelCell);
+
+      timeZones.forEach((tz, index) => {
+        const cbCell = document.createElement('th');
+        cbCell.classList.add('checkbox-row');
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.dataset.col = index;
+        checkbox.addEventListener('change', () => toggleColumnSelection(index, checkbox.checked));
+        cbCell.appendChild(checkbox);
+        checkboxRow.appendChild(cbCell);
+
+        const labelCell = document.createElement('th');
+        labelCell.dataset.col = index;
+        const currentOffset = formatOffset(DateTime.now().setZone(tz.zone).offset);
+        labelCell.innerHTML = `<div>${tz.label}</div><span class="tz-code">${tz.zone} (${currentOffset})</span>`;
+        labelRow.appendChild(labelCell);
+      });
+
+      head.appendChild(checkboxRow);
+      head.appendChild(labelRow);
+    }
+
+    function formatOffset(offsetMinutes) {
+      const hours = offsetMinutes / 60;
+      const sign = hours >= 0 ? '+' : '';
+      return `UTC${sign}${hours}`;
+    }
+
+    function toggleColumnSelection(colIndex, checked) {
+      const cells = document.querySelectorAll(`[data-col="${colIndex}"]`);
+      cells.forEach(cell => {
+        if (checked) {
+          cell.classList.add('selected-column');
+        } else {
+          cell.classList.remove('selected-column');
+        }
+      });
+    }
+
+    function createRow() {
+      const body = document.getElementById('table-body');
+      const row = document.createElement('tr');
+
+      const nameCell = document.createElement('td');
+      nameCell.innerHTML = `<div class="cell-content"><input type="text" placeholder="Datacenter neve" /></div>`;
+      row.appendChild(nameCell);
+
+      timeZones.forEach((tz, index) => {
+        const cell = document.createElement('td');
+        cell.dataset.col = index;
+        const wrapper = document.createElement('div');
+        wrapper.classList.add('cell-content');
+
+        const input = document.createElement('input');
+        input.type = 'datetime-local';
+        input.dataset.zone = tz.zone;
+        input.dataset.col = index;
+        input.addEventListener('input', () => {
+          lastEdited = { row, input, zone: tz.zone };
+          setStatus(`Aktív mező: ${tz.zone}`);
+        });
+
+        const shift = document.createElement('div');
+        shift.classList.add('day-shift');
+        shift.textContent = '';
+
+        wrapper.appendChild(input);
+        wrapper.appendChild(shift);
+        cell.appendChild(wrapper);
+        row.appendChild(cell);
+      });
+
+      body.appendChild(row);
+    }
+
+    function setStatus(message, isError = false) {
+      const status = document.getElementById('status');
+      status.textContent = message;
+      status.style.color = isError ? '#b42318' : '#6b7280';
+    }
+
+    function saveRow() {
+      if (!lastEdited || !lastEdited.input.value) {
+        setStatus('Válassz ki egy kitöltött cellát mentés előtt.', true);
+        return;
+      }
+
+      const { row, input, zone } = lastEdited;
+      const baseDate = DateTime.fromISO(input.value, { zone });
+
+      if (!baseDate.isValid) {
+        setStatus('Érvénytelen dátum/idő formátum.', true);
+        return;
+      }
+
+      const baseDayStart = baseDate.startOf('day');
+
+      row.querySelectorAll('td').forEach(cell => {
+        const inputField = cell.querySelector('input[type="datetime-local"]');
+        const shiftLabel = cell.querySelector('.day-shift');
+        if (!inputField) return;
+
+        const targetZone = inputField.dataset.zone;
+        const zonedTime = baseDate.setZone(targetZone);
+        inputField.value = zonedTime.toFormat("yyyy-MM-dd'T'HH:mm");
+
+        const dayDiff = Math.round(zonedTime.startOf('day').diff(baseDayStart, 'days').days);
+        if (dayDiff > 0) {
+          shiftLabel.textContent = `+${dayDiff} nap`;
+        } else if (dayDiff < 0) {
+          shiftLabel.textContent = `${dayDiff} nap`;
+        } else {
+          shiftLabel.textContent = '';
+        }
+      });
+
+      setStatus('Sor frissítve az összes időzónára.');
+    }
+
+    document.getElementById('add-row').addEventListener('click', createRow);
+    document.getElementById('save-row').addEventListener('click', saveRow);
+
+    buildTableHead();
+    createRow();
+    setStatus('Adj hozzá datacentereket és tölts ki egy cellát a mentéshez.');
+  </script>
+</body>
+</html>
