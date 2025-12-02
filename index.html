@@ -192,81 +192,55 @@
       line-height: 1.4;
     }
 
-    .switch-wrapper {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 10px;
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .header-left {
+      flex: 1 1 520px;
+    }
+
+    .dst-info {
+      flex: 0 0 320px;
+      background: #eef7f2;
       border: 1px solid var(--border);
+      border-left: 5px solid var(--accent);
       border-radius: 10px;
-      background: #f9fafb;
+      padding: 12px 14px;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
     }
 
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 44px;
-      height: 24px;
+    .dst-title {
+      margin: 0 0 6px;
+      font-weight: 700;
     }
 
-    .switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: #d1d5db;
-      transition: 0.2s;
-      border-radius: 14px;
-    }
-
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 18px;
-      width: 18px;
-      left: 3px;
-      bottom: 3px;
-      background-color: white;
-      transition: 0.2s;
-      border-radius: 50%;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-    }
-
-    input:checked + .slider {
-      background-color: var(--accent);
-    }
-
-    input:checked + .slider:before {
-      transform: translateX(20px);
-    }
-
-    .switch-label {
-      font-weight: 600;
+    .dst-text {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.5;
       color: #111827;
-    }
-
-    .hidden-count {
-      color: var(--muted);
-      font-weight: 600;
-      display: none;
-    }
-
-    .hidden-column {
-      display: none;
     }
   </style>
 </head>
 <body>
-  <h1>Időzóna tervező</h1>
-  <p class="hint">24 időzóna oszlop, zöld kerettel jelölhető oszlopokkal. Írj be egy dátumot/időt az egyik cellába, majd kattints a „Sor mentése” gombra: a teljes sor frissül az összes többi időzóna szerinti lokális időre, automatikus téli/nyári időszámítási korrekcióval és napváltás jelzéssel.</p>
+  <div class="header">
+    <div class="header-left">
+      <h1>Időzóna tervező</h1>
+      <p class="hint">24 időzóna oszlop, zöld kerettel jelölhető oszlopokkal. Írj be egy dátumot/időt az egyik cellába, majd kattints a „Sor mentése” gombra: a teljes sor frissül az összes többi időzóna szerinti lokális időre, automatikus téli/nyári időszámítási korrekcióval és napváltás jelzéssel.</p>
+    </div>
+    <div class="dst-info" aria-label="Nyári és téli időszámítás információ">
+      <div class="dst-title">Időszámítás váltása</div>
+      <p class="dst-text">
+        Nyári időszámítás: március utolsó vasárnapjától 02:00-tól október utolsó vasárnapjáig 03:00-ig.
+        Téli időszámítás: október utolsó vasárnapjától március utolsó vasárnapjáig.
+      </p>
+    </div>
+  </div>
 
   <div class="controls">
     <button id="add-row">Datacenter hozzáadása</button>
