@@ -311,6 +311,7 @@
       timeZones.forEach((tz, index) => {
         const cbCell = document.createElement('th');
         cbCell.classList.add('checkbox-row');
+        cbCell.dataset.col = index;
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.dataset.col = index;
