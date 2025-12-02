@@ -191,11 +191,56 @@
       max-width: 960px;
       line-height: 1.4;
     }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .header-left {
+      flex: 1 1 520px;
+    }
+
+    .dst-info {
+      flex: 0 0 320px;
+      background: #eef7f2;
+      border: 1px solid var(--border);
+      border-left: 5px solid var(--accent);
+      border-radius: 10px;
+      padding: 12px 14px;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+    }
+
+    .dst-title {
+      margin: 0 0 6px;
+      font-weight: 700;
+    }
+
+    .dst-text {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.5;
+      color: #111827;
+    }
   </style>
 </head>
 <body>
-  <h1>Időzóna tervező</h1>
-  <p class="hint">24 időzóna oszlop, zöld kerettel jelölhető oszlopokkal. Írj be egy dátumot/időt az egyik cellába, majd kattints a „Sor mentése” gombra: a teljes sor frissül az összes többi időzóna szerinti lokális időre, automatikus téli/nyári időszámítási korrekcióval és napváltás jelzéssel.</p>
+  <div class="header">
+    <div class="header-left">
+      <h1>Időzóna tervező</h1>
+      <p class="hint">24 időzóna oszlop, zöld kerettel jelölhető oszlopokkal. Írj be egy dátumot/időt az egyik cellába, majd kattints a „Sor mentése” gombra: a teljes sor frissül az összes többi időzóna szerinti lokális időre, automatikus téli/nyári időszámítási korrekcióval és napváltás jelzéssel.</p>
+    </div>
+    <div class="dst-info" aria-label="Nyári és téli időszámítás információ">
+      <div class="dst-title">Időszámítás váltása</div>
+      <p class="dst-text">
+        Nyári időszámítás: március utolsó vasárnapjától 02:00-tól október utolsó vasárnapjáig 03:00-ig.
+        Téli időszámítás: október utolsó vasárnapjától március utolsó vasárnapjáig.
+      </p>
+    </div>
+  </div>
 
   <div class="controls">
     <button id="add-row">Datacenter hozzáadása</button>
