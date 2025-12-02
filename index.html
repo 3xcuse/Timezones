@@ -526,6 +526,35 @@
       setStatus('Sor automatikusan frissítve az összes időzónára.');
     }
 
+    function saveRow() {
+      const rows = Array.from(document.querySelectorAll('#table-body tr'));
+
+      const snapshot = rows.map(row => {
+        const nameInput = row.querySelector('td:first-child input[type="text"]');
+        const name = nameInput ? nameInput.value : '';
+
+        const slots = Array.from(row.querySelectorAll('td[data-col]')).map(cell => {
+          const [startInput, endInput] = cell.querySelectorAll('input[type="datetime-local"]');
+
+          return {
+            zone: startInput?.dataset.zone || endInput?.dataset.zone || '',
+            start: startInput?.value || '',
+            end: endInput?.value || ''
+          };
+        });
+
+        return { name, slots };
+      });
+
+      try {
+        localStorage.setItem('tz-planner-rows', JSON.stringify(snapshot));
+        setStatus('Sorok sikeresen elmentve a böngészőben.');
+      } catch (error) {
+        console.error('Saving rows failed:', error);
+        setStatus('A sorok mentése nem sikerült a böngészőben.', true);
+      }
+    }
+
     document.getElementById('add-row').addEventListener('click', createRow);
     document.getElementById('save-row').addEventListener('click', saveRow);
     document.getElementById('column-visibility-toggle').addEventListener('change', applyColumnVisibility);
