@@ -107,16 +107,6 @@
       margin-top: 4px;
     }
 
-    .checkbox-row {
-      background: var(--header-bg);
-    }
-
-    .checkbox-row input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
-      cursor: pointer;
-    }
-
     .selected-column {
       outline: 3px solid #5bd28f;
       outline-offset: -2px;
@@ -192,66 +182,152 @@
       line-height: 1.4;
     }
 
-    .switch-wrapper {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 10px;
+    .tz-picker {
+      min-width: 320px;
+      position: relative;
+    }
+
+    .picker-title {
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .dropdown-shell {
+      position: relative;
+    }
+
+    .dropdown-toggle {
+      width: 100%;
+      text-align: left;
+      padding: 10px 12px;
+      background: white;
       border: 1px solid var(--border);
       border-radius: 10px;
-      background: #f9fafb;
-    }
-
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 44px;
-      height: 24px;
-    }
-
-    .switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-
-    .slider {
-      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 14px;
       cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: #d1d5db;
-      transition: 0.2s;
-      border-radius: 14px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
     }
 
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 18px;
-      width: 18px;
-      left: 3px;
-      bottom: 3px;
-      background-color: white;
-      transition: 0.2s;
-      border-radius: 50%;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    .dropdown-toggle:hover {
+      border-color: #b8bcc4;
     }
 
-    input:checked + .slider {
-      background-color: var(--accent);
+    .dropdown-toggle .summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      color: #0f172a;
     }
 
-    input:checked + .slider:before {
-      transform: translateX(20px);
-    }
-
-    .hidden-count {
-      color: var(--muted);
+    .dropdown-toggle .chip {
+      background: #e9f6ee;
+      color: #0f172a;
+      padding: 4px 8px;
+      border-radius: 999px;
       font-weight: 600;
-      display: none;
+      font-size: 12px;
+    }
+
+    .dropdown-toggle .chevron {
+      font-size: 16px;
+      color: #6b7280;
+      margin-left: auto;
+    }
+
+    .dropdown-panel {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      width: 100%;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      box-shadow: 0 14px 34px rgba(15, 23, 42, 0.14);
+      padding: 10px;
+      z-index: 5;
+    }
+
+    .search-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 6px 10px;
+    }
+
+    .search-row input {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+    }
+
+    .search-row input:focus {
+      outline: 2px solid var(--accent);
+      border-color: var(--accent);
+    }
+
+    .option-list {
+      max-height: 280px;
+      overflow: auto;
+      border-radius: 8px;
+    }
+
+    .option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: background 120ms ease;
+      min-height: 36px;
+      font-size: 14px;
+    }
+
+    .option:hover {
+      background: #f2f4f7;
+    }
+
+    .option input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: #1b7a4d;
+      cursor: pointer;
+    }
+
+    .option .option-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.3;
+    }
+
+    .option .option-zone {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .dropdown-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .dropdown-footer button {
+      flex: 1;
+      padding: 8px 12px;
+      border-radius: 8px;
+      box-shadow: none;
+      border: 1px solid var(--border);
+      background: #f8fafc;
+      color: #0f172a;
+      font-weight: 600;
     }
 
     .hidden-column {
@@ -276,12 +352,25 @@
 
   <div class="controls">
     <button id="add-row">Datacenter hozzáadása</button>
-    <div class="switch-wrapper">
-      <label class="switch" aria-label="Csak kijelölt oszlopok megjelenítése">
-        <input type="checkbox" id="column-visibility-toggle" />
-        <span class="slider"></span>
-      </label>
-      <span id="hidden-count" class="hidden-count" aria-live="polite"></span>
+    <div class="tz-picker" aria-label="Időzóna választó">
+      <div class="picker-title">Időzónák</div>
+      <div class="dropdown-shell">
+        <button id="timezone-toggle" class="dropdown-toggle" type="button" aria-haspopup="listbox" aria-expanded="false">
+          <div class="summary" id="dropdown-summary"></div>
+          <span class="chevron" aria-hidden="true">▾</span>
+        </button>
+        <div id="timezone-panel" class="dropdown-panel" hidden>
+          <div class="search-row">
+            <input id="timezone-search" type="text" placeholder="Keresés..." aria-label="Időzóna keresés" />
+          </div>
+          <div id="timezone-options" class="option-list" role="listbox" aria-label="Időzóna lista"></div>
+          <div class="dropdown-footer">
+            <button type="button" id="select-all">Összes kijelölése</button>
+            <button type="button" id="deselect-all">Kijelölések törlése</button>
+          </div>
+        </div>
+      </div>
+      <div id="selection-summary" class="hint"></div>
     </div>
     <span id="status" class="hint"></span>
   </div>
@@ -324,41 +413,37 @@
       { label: 'NZST', code: 'UTC+12', zone: 'Pacific/Auckland' }
     ];
 
+    const selectedTimeZones = new Set();
+
+    function setDefaultSelection() {
+      selectedTimeZones.clear();
+      const defaultZone = timeZones.find(tz => tz.label === 'ET')?.zone;
+      if (defaultZone) {
+        selectedTimeZones.add(defaultZone);
+      }
+    }
+
     function buildTableHead() {
       const head = document.getElementById('table-head');
       head.innerHTML = '';
 
-      const checkboxRow = document.createElement('tr');
       const labelRow = document.createElement('tr');
-
-      const nameCheckboxCell = document.createElement('th');
-      nameCheckboxCell.textContent = 'Datacenter oszlop';
-      checkboxRow.appendChild(nameCheckboxCell);
 
       const nameLabelCell = document.createElement('th');
       nameLabelCell.textContent = 'Datacenter';
       labelRow.appendChild(nameLabelCell);
 
       timeZones.forEach((tz, index) => {
-        const cbCell = document.createElement('th');
-        cbCell.classList.add('checkbox-row');
-        cbCell.dataset.col = index;
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.dataset.col = index;
-        checkbox.checked = true;
-        checkbox.addEventListener('change', () => toggleColumnSelection(index, checkbox.checked));
-        cbCell.appendChild(checkbox);
-        checkboxRow.appendChild(cbCell);
-
         const labelCell = document.createElement('th');
         labelCell.dataset.col = index;
         const currentOffset = formatOffset(DateTime.now().setZone(tz.zone).offset);
         labelCell.innerHTML = `<div>${tz.label}</div><span class="tz-code">${tz.zone} (${currentOffset})</span>`;
+        if (selectedTimeZones.has(tz.zone)) {
+          labelCell.classList.add('selected-column');
+        }
         labelRow.appendChild(labelCell);
       });
 
-      head.appendChild(checkboxRow);
       head.appendChild(labelRow);
     }
 
@@ -370,59 +455,210 @@
       return `UTC${sign}${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
     }
 
-    function toggleColumnSelection(colIndex, checked) {
-      const cells = document.querySelectorAll(`[data-col="${colIndex}"]`);
-      cells.forEach(cell => {
-        if (checked) {
-          cell.classList.add('selected-column');
-        } else {
-          cell.classList.remove('selected-column');
-        }
+    function applyColumnVisibility() {
+      timeZones.forEach((tz, index) => {
+        const isSelected = selectedTimeZones.has(tz.zone);
+        const colCells = document.querySelectorAll(`[data-col="${index}"]`);
+        colCells.forEach(cell => {
+          cell.style.display = isSelected ? '' : 'none';
+          cell.classList.toggle('selected-column', isSelected);
+        });
       });
 
+      updateSelectionSummary();
+      syncCheckboxesWithState();
+      updateDropdownSummary();
+    }
+
+    function updateSelectionSummary() {
+      const summary = document.getElementById('selection-summary');
+      if (!summary) return;
+
+      const selectedList = timeZones.filter(tz => selectedTimeZones.has(tz.zone));
+      if (selectedList.length === 0) {
+        summary.textContent = 'Nincs kiválasztott időzóna.';
+        return;
+      }
+
+      const names = selectedList.slice(0, 4).map(tz => tz.label).join(', ');
+      const extra = selectedList.length - 4;
+      summary.textContent = extra > 0 ? `${names} +${extra}` : names;
+    }
+
+    function updateDropdownSummary() {
+      const summary = document.getElementById('dropdown-summary');
+      if (!summary) return;
+
+      const selectedList = timeZones.filter(tz => selectedTimeZones.has(tz.zone));
+      summary.innerHTML = '';
+
+      if (selectedList.length === 0) {
+        summary.textContent = 'Válassz időzónát';
+        return;
+      }
+
+      const chips = selectedList.slice(0, 3);
+      chips.forEach(tz => {
+        const chip = document.createElement('span');
+        chip.classList.add('chip');
+        chip.textContent = tz.label;
+        summary.appendChild(chip);
+      });
+
+      if (selectedList.length > 3) {
+        const more = document.createElement('span');
+        more.classList.add('chip');
+        more.textContent = `+${selectedList.length - 3}`;
+        summary.appendChild(more);
+      }
+    }
+
+    function buildTimezoneOptions() {
+      const optionsList = document.getElementById('timezone-options');
+      if (!optionsList) return;
+
+      optionsList.innerHTML = '';
+      optionsList.appendChild(createAllOption());
+      timeZones.forEach((tz, index) => {
+        const currentOffset = formatOffset(DateTime.now().setZone(tz.zone).offset);
+        const option = document.createElement('div');
+        option.classList.add('option');
+        option.dataset.col = index;
+        option.dataset.search = `${tz.label} ${tz.zone} ${tz.code}`.toLowerCase();
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.value = tz.zone;
+        checkbox.checked = selectedTimeZones.has(tz.zone);
+
+        const text = document.createElement('div');
+        text.classList.add('option-text');
+        text.innerHTML = `<strong>${tz.label}</strong><span class="option-zone">${tz.zone} (${currentOffset})</span>`;
+
+        option.appendChild(checkbox);
+        option.appendChild(text);
+        optionsList.appendChild(option);
+
+        option.addEventListener('click', (event) => {
+          if (event.target.tagName.toLowerCase() !== 'input') {
+            checkbox.checked = !checkbox.checked;
+          }
+          toggleZoneSelection(tz.zone, checkbox.checked);
+        });
+
+        checkbox.addEventListener('change', (event) => {
+          toggleZoneSelection(tz.zone, event.target.checked);
+        });
+      });
+    }
+
+    function createAllOption() {
+      const option = document.createElement('div');
+      option.classList.add('option');
+      option.dataset.search = 'osszes all minden';
+
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.id = 'all-timezones';
+      checkbox.value = '__all__';
+      checkbox.checked = selectedTimeZones.size === timeZones.length;
+
+      const text = document.createElement('div');
+      text.classList.add('option-text');
+      text.innerHTML = '<strong>Összes</strong><span class="option-zone">Minden időzóna kijelölése</span>';
+
+      option.appendChild(checkbox);
+      option.appendChild(text);
+
+      option.addEventListener('click', (event) => {
+        if (event.target.tagName.toLowerCase() !== 'input') {
+          checkbox.checked = !checkbox.checked;
+        }
+        toggleAllZones(checkbox.checked);
+      });
+
+      checkbox.addEventListener('change', (event) => {
+        toggleAllZones(event.target.checked);
+      });
+
+      return option;
+    }
+
+    function toggleZoneSelection(zone, isChecked) {
+      if (isChecked) {
+        selectedTimeZones.add(zone);
+      } else {
+        selectedTimeZones.delete(zone);
+      }
       applyColumnVisibility();
     }
 
-    function applyColumnVisibility() {
-      const toggle = document.getElementById('column-visibility-toggle');
-      const hiddenCount = document.getElementById('hidden-count');
-      if (!toggle || !hiddenCount) return;
+    function toggleAllZones(isChecked) {
+      if (isChecked) {
+        timeZones.forEach(tz => selectedTimeZones.add(tz.zone));
+      } else {
+        selectedTimeZones.clear();
+      }
+      applyColumnVisibility();
+    }
 
-      const showSelectedOnly = toggle.checked;
-      const checkboxes = document.querySelectorAll('.checkbox-row input[type="checkbox"]');
-      let hiddenColumns = 0;
+    function syncCheckboxesWithState() {
+      document.querySelectorAll('#timezone-options input[type="checkbox"]').forEach(checkbox => {
+        if (checkbox.id === 'all-timezones') return;
+        checkbox.checked = selectedTimeZones.has(checkbox.value);
+      });
 
-      checkboxes.forEach((checkbox, index) => {
-        const colCells = document.querySelectorAll(`[data-col="${index}"]`);
-        colCells.forEach(cell => {
-          if (checkbox.checked) {
-            cell.classList.add('selected-column');
-          } else {
-            cell.classList.remove('selected-column');
-          }
-        });
+      const allCheckbox = document.getElementById('all-timezones');
+      if (allCheckbox) {
+        allCheckbox.checked = selectedTimeZones.size === timeZones.length;
+      }
+    }
 
-        const shouldHide = showSelectedOnly && !checkbox.checked;
-        if (shouldHide) hiddenColumns += 1;
+    function setupSelectorActions() {
+      const selectAllBtn = document.getElementById('select-all');
+      const deselectAllBtn = document.getElementById('deselect-all');
+      const searchInput = document.getElementById('timezone-search');
+      const toggle = document.getElementById('timezone-toggle');
+      const panel = document.getElementById('timezone-panel');
 
-        colCells.forEach(cell => {
-          if (shouldHide) {
-            cell.classList.add('hidden-column');
-            cell.style.display = 'none';
-          } else {
-            cell.classList.remove('hidden-column');
-            cell.style.display = '';
-          }
+      selectAllBtn?.addEventListener('click', () => {
+        timeZones.forEach(tz => selectedTimeZones.add(tz.zone));
+        applyColumnVisibility();
+      });
+
+      deselectAllBtn?.addEventListener('click', () => {
+        selectedTimeZones.clear();
+        applyColumnVisibility();
+      });
+
+      searchInput?.addEventListener('input', () => {
+        const term = searchInput.value.trim().toLowerCase();
+        document.querySelectorAll('#timezone-options .option').forEach(option => {
+          const matches = option.dataset.search.includes(term);
+          option.style.display = matches ? '' : 'none';
         });
       });
 
-      if (showSelectedOnly) {
-        hiddenCount.style.display = 'inline';
-        hiddenCount.textContent = `${hiddenColumns} időzóna el van rejtve!`;
-      } else {
-        hiddenCount.style.display = 'none';
-        hiddenCount.textContent = '';
-      }
+      toggle?.addEventListener('click', () => {
+        const isOpen = !panel.hasAttribute('hidden');
+        if (isOpen) {
+          panel.setAttribute('hidden', '');
+          toggle.setAttribute('aria-expanded', 'false');
+        } else {
+          panel.removeAttribute('hidden');
+          toggle.setAttribute('aria-expanded', 'true');
+          searchInput?.focus();
+        }
+      });
+
+      document.addEventListener('click', (event) => {
+        if (!panel || !toggle) return;
+        if (panel.hasAttribute('hidden')) return;
+        if (!panel.contains(event.target) && !toggle.contains(event.target)) {
+          panel.setAttribute('hidden', '');
+          toggle.setAttribute('aria-expanded', 'false');
+        }
+      });
     }
 
     function createDateInput(label, zone, row, fieldType) {
@@ -526,12 +762,14 @@
     }
 
     document.getElementById('add-row').addEventListener('click', createRow);
-    document.getElementById('column-visibility-toggle').addEventListener('change', applyColumnVisibility);
 
+    setDefaultSelection();
     buildTableHead();
+    buildTimezoneOptions();
+    setupSelectorActions();
     createRow();
-    setStatus('Adj hozzá datacentereket és tölts ki egy cellát az időzónák frissítéséhez.');
     applyColumnVisibility();
+    setStatus('Adj hozzá datacentereket és tölts ki egy cellát az időzónák frissítéséhez.');
   </script>
 </body>
 </html>
