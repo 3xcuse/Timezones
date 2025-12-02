@@ -260,8 +260,19 @@
   </style>
 </head>
 <body>
-  <h1>Időzóna tervező</h1>
-  <p class="hint">24 időzóna oszlop, zöld kerettel jelölhető oszlopokkal. Írj be egy dátumot/időt az egyik cellába, majd kattints a „Sor mentése” gombra: a teljes sor frissül az összes többi időzóna szerinti lokális időre, automatikus téli/nyári időszámítási korrekcióval és napváltás jelzéssel.</p>
+  <div class="header">
+    <div class="header-left">
+      <h1>Időzóna tervező</h1>
+      <p class="hint">24 időzóna oszlop, zöld kerettel jelölhető oszlopokkal. Írj be egy dátumot/időt az egyik cellába, és a teljes sor automatikusan frissül az összes többi időzóna szerinti lokális időre, automatikus téli/nyári időszámítási korrekcióval és napváltás jelzéssel.</p>
+    </div>
+    <div class="dst-info" aria-label="Nyári és téli időszámítás információ">
+      <div class="dst-title">Időszámítás váltása</div>
+      <p class="dst-text">
+        Nyári időszámítás: március utolsó vasárnapjától 02:00-tól október utolsó vasárnapjáig 03:00-ig.
+        Téli időszámítás: október utolsó vasárnapjától március utolsó vasárnapjáig.
+      </p>
+    </div>
+  </div>
 
   <div class="controls">
     <button id="add-row">Datacenter hozzáadása</button>
@@ -313,8 +324,6 @@
       { label: 'AEST', code: 'UTC+10', zone: 'Australia/Sydney' },
       { label: 'NZST', code: 'UTC+12', zone: 'Pacific/Auckland' }
     ];
-
-    let lastEdited = null;
 
     function buildTableHead() {
       const head = document.getElementById('table-head');
@@ -422,8 +431,15 @@
       input.dataset.zone = zone;
       input.dataset.type = fieldType;
       input.addEventListener('input', () => {
-        lastEdited = { row, input, zone, fieldType };
         setStatus(`Aktív mező: ${zone} (${label})`);
+        if (input.value) {
+          updateRowTimes(row, input, zone, fieldType);
+        }
+      });
+      input.addEventListener('change', () => {
+        if (input.value) {
+          updateRowTimes(row, input, zone, fieldType);
+        }
       });
 
       const shift = document.createElement('div');
@@ -472,13 +488,7 @@
       status.style.color = isError ? '#b42318' : '#6b7280';
     }
 
-    function saveRow() {
-      if (!lastEdited || !lastEdited.input.value) {
-        setStatus('Válassz ki egy kitöltött cellát mentés előtt.', true);
-        return;
-      }
-
-      const { row, input, zone, fieldType } = lastEdited;
+    function updateRowTimes(row, input, zone, fieldType) {
       const baseDate = DateTime.fromISO(input.value, { zone });
 
       if (!baseDate.isValid) {
@@ -504,7 +514,7 @@
         }
       });
 
-      setStatus('Sor frissítve az összes időzónára.');
+      setStatus('Sor automatikusan frissítve az összes időzónára.');
     }
 
     document.getElementById('add-row').addEventListener('click', createRow);
