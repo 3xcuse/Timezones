@@ -347,6 +347,7 @@
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.dataset.col = index;
+        checkbox.checked = true;
         checkbox.addEventListener('change', () => toggleColumnSelection(index, checkbox.checked));
         cbCell.appendChild(checkbox);
         checkboxRow.appendChild(cbCell);
@@ -394,6 +395,14 @@
 
       checkboxes.forEach((checkbox, index) => {
         const colCells = document.querySelectorAll(`[data-col="${index}"]`);
+        colCells.forEach(cell => {
+          if (checkbox.checked) {
+            cell.classList.add('selected-column');
+          } else {
+            cell.classList.remove('selected-column');
+          }
+        });
+
         const shouldHide = showSelectedOnly && !checkbox.checked;
         if (shouldHide) hiddenColumns += 1;
 
